@@ -1,0 +1,5 @@
+current epoch => boardroom 
+    import useCurrentEpoch from '../../hooks/useCurrentEpoch';
+    const currentEpoch = useCurrentEpoch();
+    <Typography>{Number(currentEpoch)}</Typography>
+
