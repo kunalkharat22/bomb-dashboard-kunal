@@ -1,10 +1,48 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 import bomb from '../assets/bomb.svg'
 import bshare from '../assets/bshare.svg'
 import { Box, Typography, Grid, Button } from '@material-ui/core'
+import useEarningsOnBoardroom from './../../../hooks/useEarningsOnBoardroom';
+import useBombStats from './../../../hooks/useBombStats';
+import {getDisplayBalance} from './../../../utils/formatBalance';
+import useStakedBalanceOnBoardroom from './../../../hooks/useStakedBalanceOnBoardroom';
+import useStakedTokenPriceInDollars from './../../../hooks/useStakedTokenPriceInDollars';
+import useBombFinance from './../../../hooks/useBombFinance';
+import useTotalStakedOnBoardroom from './../../../hooks/useTotalStakedOnBoardroom';
+import useHarvestFromBoardroom from './../../../hooks/useHarvestFromBoardroom';
+import useClaimRewardCheck from './../../../hooks/boardroom/useClaimRewardCheck';
 
+  
 
 const BoardroomCard = () => {
+
+  const bombStats = useBombStats();
+  const earnings = useEarningsOnBoardroom();
+  const stakedBalance = useStakedBalanceOnBoardroom();
+  const bombFinance = useBombFinance();
+  const totalStaked = useTotalStakedOnBoardroom();
+  const {onReward} = useHarvestFromBoardroom();
+  const canClaimReward = useClaimRewardCheck();
+  const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
+
+
+  const tokenPriceInDollars = useMemo(
+    () => (bombStats ? Number(bombStats.priceInDollars).toFixed(2) : null),
+    [bombStats],
+  )
+
+  const bTokenPriceInDollars = useMemo(
+    () =>
+      stakedTokenPriceInDollars
+        ? (Number(stakedTokenPriceInDollars) * Number(getDisplayBalance(stakedBalance))).toFixed(2).toString()
+        : null,
+    [stakedTokenPriceInDollars, stakedBalance],
+  )
+
+  const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
+
+  
+
   return (
     <>
       <Box sx={{ display:'flex' ,alignContent: 'flex-start', flexDirection:'row' }}>
@@ -41,7 +79,7 @@ const BoardroomCard = () => {
 
       <Box sx={{ display:'flex', justifyContent: 'flex-end'}}>
       <Typography variant='body1' style={{textAlign:'right',margin: '0.5rem 24px 0 1rem'}}>
-        Total Staked:<img src={bshare} alt='bomb' style={{height: '16px', width:'16px'}} />7323
+        Total Staked:<img src={bshare} alt='bomb' style={{height: '16px', width:'16px'}} />{getDisplayBalance(totalStaked)}
       </Typography>
       </Box>
 
@@ -59,8 +97,8 @@ const BoardroomCard = () => {
             Your Stake
           </Typography>
           <Typography variant='h5' style={{ color: '#fff',marginLeft:'1rem'}}>
-            <img src={bshare} alt='bomb' style={{height: '22px', width:'22px'}} />124.21
-            ≈$1171.62
+            <img src={bshare} alt='bomb' style={{height: '22px', width:'22px'}} />
+            {getDisplayBalance(earnings)}<br />≈{earnedInDollars}
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -68,8 +106,9 @@ const BoardroomCard = () => {
             Earned
           </Typography>
           <Typography variant='h5' style={{ color: '#fff',marginLeft:'1rem'}}>
-            <img src={bomb} alt='bomb' style={{height: '22px', width:'22px'}} />124.21
-            ≈$1171.62
+            <img src={bomb} alt='bomb' style={{height: '22px', width:'22px'}} />
+            {getDisplayBalance(stakedBalance)}<br />
+            ≈{bTokenPriceInDollars}
           </Typography>
         </Grid>
         <Grid item xs={6}>
@@ -85,7 +124,13 @@ const BoardroomCard = () => {
               </Typography>
             </Button>
             
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 170px', textAlign:'center', whiteSpace:'nowrap', marginTop: '1rem' }}>
+            <Button 
+              onClick={onReward}
+              className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
+              disabled={earnings.eq(0) || !canClaimReward}
+              variant='outlined' 
+              style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 170px', textAlign:'center', whiteSpace:'nowrap', marginTop: '1rem' }}
+            >
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize'}}>
                 Claim Rewards
               </Typography>

@@ -1,8 +1,13 @@
 import React from 'react'
 import bonds from '../assets/bonds.svg'
 import { Box, Grid, Typography, Button } from '@material-ui/core'
+import useBondStats from '../../../hooks/useBondStats';
 
 const Bonds = () => {
+
+  const bondStat = useBondStats();
+  console.log(bondStat);
+
   return (
     <>
     <Box sx={{ display:'flex' ,alignContent: 'flex-start', flexDirection:'row' }}>
@@ -27,7 +32,7 @@ const Bonds = () => {
             Current Price: (Bomb)^2
           </Typography>
           <Typography variant='h5' style={{ color: '#fff',marginLeft:'1rem'}}>
-            BBond = 6.2872 BTCB
+            BBond = {bondStat?.tokenInFtm} BTCB
           </Typography>
         </Grid>
         <Grid item xs={5}>

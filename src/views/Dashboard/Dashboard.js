@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 import moment from 'moment';
 
 import Page from '../../components/Page';
@@ -15,6 +15,11 @@ import HomeImage from '../../assets/img/background.jpg';
 import { Box, Card, CardContent, Grid, Typography, Button } from '@material-ui/core';
 import ProgressCountdown from '../Boardroom/components/ProgressCountdown'
 import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
+import useCashPriceInEstimatedTWAP from './../../hooks/useCashPriceInEstimatedTWAP';
+import useTotalValueLocked from './../../hooks/useTotalValueLocked';
+
+import CountUp from 'react-countup';
+import { getDisplayBalance } from '../../utils/formatBalance';
 
 
 const BackgroundImage = createGlobalStyle`
@@ -41,6 +46,11 @@ const Dashboard = () => {
   const classes = useStyles();
   const currentEpoch = useCurrentEpoch();
   const { to } = useTreasuryAllocationTimes();
+  const TVL = useTotalValueLocked();
+  const cashStat = useCashPriceInEstimatedTWAP();
+
+  const scalingFactor = useMemo(() => (cashStat ? Number(cashStat.priceInDollars).toFixed(4) : null), [cashStat]);
+
   
   return (
     <Page>
@@ -70,8 +80,10 @@ const Dashboard = () => {
                           </Typography>
                           <Typography variant='h6' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Next Epoch in</Typography>
                           <hr style={{ opacity: 0.5, margin: '10px 30px 10px 30px'}}/>
-                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Live TWAP</Typography>
-                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>TVL</Typography>
+                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Live TWAP: <span>{scalingFactor}</span></Typography>
+                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>
+                              TVL: <CountUp end={TVL} separator="," prefix="$" />  
+                            </Typography>
                             <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Last Epoch TWAP</Typography>
                         </Grid>
                         <Grid item xs={4}>
@@ -86,9 +98,11 @@ const Dashboard = () => {
                         <Grid item xs={8}>
                           <Grid container spacing={2}>
                             <Grid item xs={12} style={{textAlign:'end'}} >
-                              <Typography variant='h5' style={{color: '#9EE6FF', marginRight:'1rem', textTransform: 'capitalize',}}>
-                                Read Investment Strategy
-                              </Typography>
+                              <a href='https://docs.bomb.money/welcome-start-here/strategies' target='_blank'>
+                                <Typography variant='h5' style={{color: '#9EE6FF', marginRight:'1rem', textTransform: 'capitalize',}}>
+                                  Read Investment Strategy
+                                </Typography>
+                              </a>
                             </Grid>
                             <Grid item xs={12} style={{textAlign:'center'}} >
                               <Button variant="contained" style={{backgroundColor:'rgba(158, 230, 255, 0.5)', padding: '0.5rem 21rem'}}>
@@ -99,12 +113,12 @@ const Dashboard = () => {
                             </Grid>
                             <Grid item xs={12} style={{textAlign:'center'}} >
                               <Box>
-                                <Button variant="contained" style={{backgroundColor:'rgba(255, 255, 255, 0.5)', padding: '0.5rem 7rem', marginRight:'0.8rem'}}>
+                                <Button href='https://discord.com/invite/94Aa4wSz3e' target="_blank" variant="contained" style={{backgroundColor:'rgba(255, 255, 255, 0.5)', padding: '0.5rem 7rem', marginRight:'0.8rem'}}>
                                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
                                     Chat on Discord
                                   </Typography>
                                 </Button>
-                                <Button variant="contained" style={{backgroundColor:'rgba(255, 255, 255, 0.5)', padding: '0.5rem 8rem',  marginLeft:'0.8rem'}}>
+                                <Button href='https://docs.bomb.money/' target="_blank" variant="contained" style={{backgroundColor:'rgba(255, 255, 255, 0.5)', padding: '0.5rem 8rem',  marginLeft:'0.8rem'}}>
                                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
                                     Read Docs
                                   </Typography>
