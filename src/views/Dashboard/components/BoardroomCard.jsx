@@ -11,6 +11,14 @@ import useBombFinance from './../../../hooks/useBombFinance';
 import useTotalStakedOnBoardroom from './../../../hooks/useTotalStakedOnBoardroom';
 import useHarvestFromBoardroom from './../../../hooks/useHarvestFromBoardroom';
 import useClaimRewardCheck from './../../../hooks/boardroom/useClaimRewardCheck';
+import useApprove, {ApprovalState} from '../../../hooks/useApprove';
+import useWithdrawCheck from '../../../hooks/boardroom/useWithdrawCheck';
+import useModal from '../../../hooks/useModal';
+import WithdrawModal from '../../Bank/components/WithdrawModal';
+import useWithdrawFromBoardroom from '../../../hooks/useWithdrawFromBoardroom';
+import useStakeToBoardroom from '../../../hooks/useStakeToBoardroom';
+import DepositModal from '../../Bank/components/DepositModal';
+import useTokenBalance from '../../../hooks/useTokenBalance';
 
   
 
@@ -24,7 +32,8 @@ const BoardroomCard = () => {
   const {onReward} = useHarvestFromBoardroom();
   const canClaimReward = useClaimRewardCheck();
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
-
+  const [approveStatus, approve] = useApprove(bombFinance.BSHARE, bombFinance.contracts.Boardroom.address);
+  const tokenBalance = useTokenBalance(bombFinance.BSHARE);
 
   const tokenPriceInDollars = useMemo(
     () => (bombStats ? Number(bombStats.priceInDollars).toFixed(2) : null),
@@ -42,6 +51,31 @@ const BoardroomCard = () => {
   const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
 
   
+  const {onStake} = useStakeToBoardroom();
+  const {onWithdraw} = useWithdrawFromBoardroom();
+  const canWithdrawFromBoardroom = useWithdrawCheck();
+
+  const [onPresentDeposit, onDismissDeposit] = useModal(
+    <DepositModal
+      max={tokenBalance}
+      onConfirm={(value) => {
+        onStake(value);
+        onDismissDeposit();
+      }}
+      tokenName={'BShare'}
+    />,
+  );
+
+  const [onPresentWithdraw, onDismissWithdraw] = useModal(
+    <WithdrawModal
+      max={stakedBalance}
+      onConfirm={(value) => {
+        onWithdraw(value);
+        onDismissWithdraw();
+      }}
+      tokenName={'BShare'}
+    />,
+  );
 
   return (
     <>
@@ -113,7 +147,8 @@ const BoardroomCard = () => {
         </Grid>
         <Grid item xs={6}>
           <Box sx={{display:'flex',flexWrap:'wrap', justifyContent:'center', marginTop:'0.5rem'}}>
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+            
+            {/* <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
                 Deposit
               </Typography>
@@ -122,7 +157,42 @@ const BoardroomCard = () => {
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
                 Withdraw
               </Typography>
-            </Button>
+            </Button> */}
+
+            {approveStatus !== ApprovalState.APPROVED ? (
+                <Button
+                  disabled={approveStatus !== ApprovalState.NOT_APPROVED}
+                  //className={approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'}
+                  //style={{marginTop: '20px'}}
+                  onClick={approve}
+                  variant='outlined' 
+              style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 170px', textAlign:'center', whiteSpace:'nowrap', marginTop: '1rem' }}
+                >
+                  <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize'}}>
+                    Approve BSHARE
+                  </Typography>
+                </Button>
+              ) : (
+                <>
+                <Button onClick={onPresentDeposit} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+                  <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
+                    Deposit
+                  </Typography>
+                </Button>
+                <Button disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem' }}>
+                  <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
+                    Withdraw
+                  </Typography>
+                </Button>
+                  {/* <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
+                    <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                  </IconButton>
+                  <StyledActionSpacer />
+                  <IconButton onClick={onPresentDeposit}>
+                    <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                  </IconButton> */}
+                </>
+              )}
             
             <Button 
               onClick={onReward}

@@ -1,12 +1,53 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import bonds from '../assets/bonds.svg'
 import { Box, Grid, Typography, Button } from '@material-ui/core'
 import useBondStats from '../../../hooks/useBondStats';
+import useWallet from 'use-wallet';
+import useBombFinance from '../../../hooks/useBombFinance';
+import BondCard from './BondCard'
+import useBondsPurchasable from '../../../hooks/useBondsPurchasable';
+import useCashPriceInLastTWAP from '../../../hooks/useCashPriceInLastTWAP';
+import { useTransactionAdder } from '../../../state/transactions/hooks';
+import useApprove from '../../../hooks/useApprove';
+import { BOND_REDEEM_PRICE, BOND_REDEEM_PRICE_BN } from './../../../bomb-finance/constants';
+import { getDisplayBalance } from '../../../utils/formatBalance';
+import useTokenBalance from '../../../hooks/useTokenBalance';
+
 
 const Bonds = () => {
 
   const bondStat = useBondStats();
   console.log(bondStat);
+  const bombFinance = useBombFinance();
+  const bondsPurchasable = useBondsPurchasable();
+  const addTransaction = useTransactionAdder();
+  const cashPrice = useCashPriceInLastTWAP();
+  const bondBalance = useTokenBalance(bombFinance?.BBOND);
+
+  const {account} = useWallet();
+  const {
+    contracts: {Treasury},
+  } = useBombFinance();
+
+  const isBondRedeemable = useMemo(() => cashPrice.gt(BOND_REDEEM_PRICE_BN), [cashPrice]);
+  const isBondPurchasable = useMemo(() => Number(bondStat?.tokenInFtm) < 1.01, [bondStat]);
+  const handleBuyBonds = useCallback(
+    async (amount) => {
+      const tx = await bombFinance.buyBonds(amount);
+      addTransaction(tx, {
+        summary: `Buy ${Number(amount).toFixed(2)} BBOND with ${amount} BOMB`,
+      });
+    },
+    [bombFinance, addTransaction],
+  );
+
+  const handleRedeemBonds = useCallback(
+    async (amount) => {
+      const tx = await bombFinance.redeemBonds(amount);
+      addTransaction(tx, {summary: `Redeem ${amount} BBOND`});
+    },
+    [bombFinance, addTransaction],
+  );
 
   return (
     <>
@@ -40,7 +81,8 @@ const Bonds = () => {
             Available to redeem: 
           </Typography>
           <Typography variant='h4' style={{ color: '#fff',marginLeft:'1rem', textAlign:'center'}}>
-            <img src={bonds} alt='bomb' style={{height: '35px', width:'35px'}} />456
+            <img src={bonds} alt='bomb' style={{height: '35px', width:'35px'}} />
+            {getDisplayBalance(bondBalance)}
           </Typography>
         </Grid>
         <Grid item xs={4} >
@@ -56,11 +98,18 @@ const Bonds = () => {
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginleft:'10rem'  }}>
-                <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center', }}>
-                   Purchase
-                </Typography>
-              </Button>
+              <BondCard 
+                action="Purchase"
+                fromToken={bombFinance.BOMB}
+                fromTokenName="BOMB"              
+                priceDesc={
+                  !isBondPurchasable
+                    ? 'BOMB is over peg'
+                    : getDisplayBalance(bondsPurchasable, 18, 4) + ' BBOND available for purchase'
+                }
+                onExchange={handleBuyBonds}
+                disabled={!bondStat || isBondRedeemable}
+              />              
             </Grid>
             <Grid item xs={12}>
               <hr style={{opacity:'0.5'}}/>
@@ -71,11 +120,17 @@ const Bonds = () => {
                 </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginleft:'10rem'  }}>
-                <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center', }}>
-                   Reedem
-                </Typography>
-              </Button>
+              <BondCard 
+                action="Redeem"
+                fromToken={bombFinance.BBOND}
+                fromTokenName="BBOND"
+                toToken={bombFinance.BOMB}
+                toTokenName="BOMB"
+                priceDesc={`${getDisplayBalance(bondBalance)} BBOND Available in wallet`}
+                onExchange={handleRedeemBonds}
+                disabled={!bondStat || bondBalance.eq(0) || !isBondRedeemable}
+                disabledDescription={!isBondRedeemable ? `Enabled when 10,000 BOMB > ${BOND_REDEEM_PRICE}BTC` : null}
+              />
             </Grid>
 
           </Grid>

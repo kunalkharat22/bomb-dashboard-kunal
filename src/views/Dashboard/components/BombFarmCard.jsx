@@ -11,6 +11,14 @@ import useShareStats from '../../../hooks/usebShareStats';
 import useBombStats from '../../../hooks/useBombStats';
 import useStatsForPool from '../../../hooks/useStatsForPool';
 import useBanks from '../../../hooks/useBanks';
+import useApprove, {ApprovalState} from '../../../hooks/useApprove';
+import useModal from '../../../hooks/useModal';
+import WithdrawModal from '../../Bank/components/WithdrawModal';
+import useWithdraw from '../../../hooks/useWithdraw';
+import useTokenBalance from '../../../hooks/useTokenBalance';
+import DepositModal from '../../Bank/components/DepositModal';
+import useStake from '../../../hooks/useStake';
+import useRedeem from '../../../hooks/useRedeem';
 
 
 const BombFarmCard = ({bank}) => {
@@ -22,6 +30,9 @@ const BombFarmCard = ({bank}) => {
   const [banks] = useBanks();
   const bombPriceInBNB = useMemo(() => (bombStats ? Number(bombStats.tokenInFtm).toFixed(4) : null), [bombStats]);
   let statsOnPool = useStatsForPool(bank);
+  const [approveStatus, approve] = useApprove(bank.depositToken, bank.address);
+  const tokenBalance = useTokenBalance(bank.depositToken);
+  const { onRedeem } = useRedeem(bank);
 
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars(bank.depositTokenName, bank.depositToken);
   const tokenPriceInDollars = useMemo(
@@ -39,7 +50,35 @@ const BombFarmCard = ({bank}) => {
   );
   const hEarnedInDollars = (Number(hTokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
 
-  
+  const {onWithdraw} = useWithdraw(bank);
+  const {onStake} = useStake(bank);
+
+  const [onPresentDeposit, onDismissDeposit] = useModal(
+    <DepositModal
+      max={tokenBalance}
+      decimals={bank.depositToken.decimal}
+      onConfirm={(amount) => {
+        if (Number(amount) <= 0 || isNaN(Number(amount))) return;
+        onStake(amount);
+        onDismissDeposit();
+      }}
+      tokenName={bank.depositTokenName}
+    />,
+  );
+
+  const [onPresentWithdraw, onDismissWithdraw] = useModal(
+    <WithdrawModal
+      max={stakedBalance}
+      decimals={bank.depositToken.decimal}
+      onConfirm={(amount) => {
+        if (Number(amount) <= 0 || isNaN(Number(amount))) return;
+        onWithdraw(amount);
+        onDismissWithdraw();
+      }}
+      tokenName={bank.depositTokenName}
+    />,
+  );
+
   return (
     <>
       
@@ -112,7 +151,40 @@ const BombFarmCard = ({bank}) => {
         </Grid>
           <Grid item xs={6} style={{marginTop:'3rem'}}>
           <Box sx={{display:'flex',flexWrap:'wrap', justifyContent:'center', marginTop:'0.5rem'}}>
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+            
+          {approveStatus !== ApprovalState.APPROVED ? (
+              <Button
+                disabled={
+                  bank.closedForStaking ||
+                  approveStatus === ApprovalState.PENDING ||
+                  approveStatus === ApprovalState.UNKNOWN
+                }
+                onClick={approve}
+                variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 110px', textAlign:'center', marginLeft:'0.5rem', whiteSpace:'nowrap'}}
+              >
+                <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize'}}>
+                  Approve
+                </Typography>
+               
+              </Button>
+            ) : (
+              <>
+                <Button disabled={bank.closedForStaking} onClick={() => (bank.closedForStaking ? null : onPresentDeposit())} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+                  <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
+                    Deposit
+                  </Typography>
+                </Button>
+                <Button onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem', marginRight:'0.5rem' }}>
+                  <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
+                    Withdraw
+                  </Typography>
+                </Button> 
+
+                
+              </>
+            )}
+
+            {/* <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
                 Deposit
               </Typography>
@@ -121,9 +193,9 @@ const BombFarmCard = ({bank}) => {
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
                 Withdraw
               </Typography>
-            </Button>
+            </Button> */}
             
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 110px', textAlign:'center', marginLeft:'0.5rem', whiteSpace:'nowrap'}}>
+            <Button onClick={onRedeem} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 110px', textAlign:'center', marginLeft:'0.5rem', whiteSpace:'nowrap'}}>
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize'}}>
                 Claim Rewards
               </Typography>
