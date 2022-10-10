@@ -20,8 +20,8 @@ function removeCommas(str) {
   return a;
 }
 
-function createData(icon,token, currentSupply, totalSupply, price) {
-    return { icon,token, currentSupply, totalSupply, price };
+function createData(icon,token, currentSupply, totalSupply, price, inBTCB) {
+    return { icon,token, currentSupply, totalSupply, price, inBTCB };
   }
   
   
@@ -41,13 +41,17 @@ export default function Table() {
   );
   const bShareTotalSupply = useMemo(() => (bShareStats ? String(bShareStats.totalSupply) : null), [bShareStats]);
   const bsharePriceInDollars = useMemo(() => (bShareStats ? Number(bShareStats.priceInDollars).toFixed(4) : null), [bShareStats])
+  const bSharePriceInBNB = useMemo(
+    () => (bShareStats ? Number(bShareStats.tokenInFtm).toFixed(4) : null),
+    [bShareStats],
+  );
   const tBondCirculatingSupply = useMemo(
     () => (tBondStats ? String(tBondStats.circulatingSupply) : null),
     [tBondStats],
   );
   const tBondTotalSupply = useMemo(() => (tBondStats ? String(tBondStats.totalSupply) : null), [tBondStats]);
   const tBondPriceInDollars = useMemo(() => (tBondStats ? Number(tBondStats.priceInDollars).toFixed(4) : null), [tBondStats])
-
+  const tBondPriceInBNB = useMemo(() => (tBondStats ? Number(tBondStats.tokenInFtm).toFixed(4) : null), [tBondStats]);
 
   const rows = [
     createData(
@@ -55,21 +59,24 @@ export default function Table() {
       '$BOMB', 
       millify(removeCommas(roundAndFormatNumber(bombCirculatingSupply, 2))), 
       millify(removeCommas(roundAndFormatNumber(bombTotalSupply, 2))), 
-      millify((bombPriceInDollars ? bombPriceInDollars : '-.----'),{precision:2})
+      millify((bombPriceInDollars ? bombPriceInDollars : '-.----'),{precision:2}),
+      millify((bombPriceInBNB ? bombPriceInBNB : '-.----'),{precision:2})
       ),
     createData(
       bshare,
       '$BSHARE', 
       millify(removeCommas(roundAndFormatNumber(bShareCirculatingSupply, 2))), 
       millify(removeCommas(roundAndFormatNumber(bShareTotalSupply, 2))), 
-      millify((bsharePriceInDollars ? bsharePriceInDollars : '-.----'),{precision:2})
+      millify((bsharePriceInDollars ? bsharePriceInDollars : '-.----'),{precision:2}),
+      millify((bSharePriceInBNB ? bSharePriceInBNB : '-.----'),{precision:2})
       ),
     createData(
       bonds,
       '$BBOND', 
       millify(removeCommas(roundAndFormatNumber(tBondCirculatingSupply, 2))), 
       millify(removeCommas(roundAndFormatNumber(tBondTotalSupply, 2))), 
-      millify((tBondPriceInDollars ? tBondPriceInDollars : '-.----'),{precision:2})
+      millify((tBondPriceInDollars ? tBondPriceInDollars : '-.----'),{precision:2}),
+      millify((tBondPriceInBNB ? tBondPriceInBNB : '-.----'),{precision:2})
       ),
   ];
 
@@ -121,8 +128,8 @@ export default function Table() {
             </Typography>
           </td>
           <td>
-            <Typography variant='h6' style={{color: 'white',}}>
-               ${row.price}
+            <Typography variant='h6' style={{color: 'white'}}>
+               ${row.price}<br />{row.inBTCB}BTCB
             </Typography>
           </td>
           <td align="right">

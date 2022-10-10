@@ -20,6 +20,7 @@ const BombFarmCard = ({bank}) => {
   const bombStats = useBombStats();
   const tShareStats = useShareStats();
   const [banks] = useBanks();
+  const bombPriceInBNB = useMemo(() => (bombStats ? Number(bombStats.tokenInFtm).toFixed(4) : null), [bombStats]);
   let statsOnPool = useStatsForPool(bank);
 
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars(bank.depositTokenName, bank.depositToken);
