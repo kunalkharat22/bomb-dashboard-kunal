@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react'
+import React, {useMemo, useEffect, useState} from 'react'
 import bomb from '../assets/bomb.svg'
 import bshare from '../assets/bshare.svg'
 import { Box, Typography, Grid, Button } from '@material-ui/core'
@@ -19,11 +19,9 @@ import useWithdrawFromBoardroom from '../../../hooks/useWithdrawFromBoardroom';
 import useStakeToBoardroom from '../../../hooks/useStakeToBoardroom';
 import DepositModal from '../../Bank/components/DepositModal';
 import useTokenBalance from '../../../hooks/useTokenBalance';
-
   
 
 const BoardroomCard = () => {
-
   const bombStats = useBombStats();
   const earnings = useEarningsOnBoardroom();
   const stakedBalance = useStakedBalanceOnBoardroom();
@@ -34,6 +32,29 @@ const BoardroomCard = () => {
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
   const [approveStatus, approve] = useApprove(bombFinance.BSHARE, bombFinance.contracts.Boardroom.address);
   const tokenBalance = useTokenBalance(bombFinance.BSHARE);
+  const [boardroomTVL, setBoardroomTVL] = useState('')
+  const [dailyAPR, setDailyAPR] = useState('')
+
+  const getTVL = async () => {
+    const boardroomtShareBalanceOf = await bombFinance.BSHARE.balanceOf(bombFinance.currentBoardroom().address);
+    const BSHAREPrice = ( await bombFinance.getShareStat()).priceInDollars;
+    const boardroomTVL = Number(getDisplayBalance(boardroomtShareBalanceOf, bombFinance.BSHARE.decimal)) * Number(BSHAREPrice);
+    setBoardroomTVL(boardroomTVL)
+  };
+
+  useEffect(() => {
+    getTVL()
+    getDailyAPR()
+  }, [])
+  
+  
+  // BshareBnbLPBShareRewardPool
+
+  const getDailyAPR = async () => {
+    const dailyAPR = (await bombFinance.getBoardroomAPR()) / 365;
+    setDailyAPR(dailyAPR);
+  }
+
 
   const tokenPriceInDollars = useMemo(
     () => (bombStats ? Number(bombStats.priceInDollars).toFixed(2) : null),
@@ -104,7 +125,7 @@ const BoardroomCard = () => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant='body1' style={{textAlign:'right',margin: '0.5rem 0 0 1rem'}}>
-                TVL: $1,008,430
+                TVL: ${Number(boardroomTVL).toFixed(2)}
               </Typography>
             </Grid>
         </Grid>
@@ -123,7 +144,7 @@ const BoardroomCard = () => {
             Daily Returns:
           </Typography>
           <Typography variant='h5' style={{ color: '#fff',marginLeft:'1rem'}}>
-            2%
+            {Number(dailyAPR).toFixed(2)}%
           </Typography>
         </Grid>
         <Grid item xs={2}>

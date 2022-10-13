@@ -289,7 +289,7 @@ export class BombFinance {
 
   async getBombPriceInLastTWAP(): Promise<BigNumber> {
     const { Treasury } = this.contracts;
-    return Treasury.getBombUpdatedPrice();
+    return Treasury.getBombPrice();
   }
 
   // async getBombPegTWAP(): Promise<any> {

@@ -43,7 +43,7 @@ const Bond: React.FC = () => {
   const bondsPurchasable = useBondsPurchasable();
 
   const bondBalance = useTokenBalance(bombFinance?.BBOND);
-  console.log(bondBalance);
+  
   
   //const scalingFactor = useMemo(() => (cashPrice ? Number(cashPrice) : null), [cashPrice]);
 

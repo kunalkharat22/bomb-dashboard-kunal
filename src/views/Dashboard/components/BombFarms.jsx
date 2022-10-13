@@ -8,12 +8,14 @@ import useBank from '../../../hooks/useBank'
 import useBanks from '../../../hooks/useBanks'
 import BombFarmCard from './BombFarmCard'
 import useStatsForPool from '../../../hooks/useStatsForPool'
+import useRedeem from '../../../hooks/useRedeem'
 
 const BombFarms = () => {
 
   const [banks] = useBanks();
-  console.log(banks);
-  
+  const bank = useBank("BombBShareRewardPool");
+  const { onRedeem } = useRedeem(bank);
+
   return (
     <>
       <Grid container>
@@ -28,7 +30,7 @@ const BombFarms = () => {
           </Box>
         </Grid>
         <Grid item xs={3}>
-          <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '10px 120px 25px 120px', marginRight:'0.5rem', alignItems:'center' }}>
+          <Button onClick={onRedeem} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '10px 120px 25px 120px', marginRight:'0.5rem', alignItems:'center' }}>
             <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign:'center', whiteSpace:'nowrap', marginTop: '1rem' }}>
                 Claim All <img src={bshare} alt='bomb' style={{height: '22px', width:'22px', backgroundColor: 'rgba(55, 55, 71, 1)', borderRadius: '50%'}} />
             </Typography>

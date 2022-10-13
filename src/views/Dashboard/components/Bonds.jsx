@@ -4,7 +4,7 @@ import { Box, Grid, Typography, Button } from '@material-ui/core'
 import useBondStats from '../../../hooks/useBondStats';
 import useWallet from 'use-wallet';
 import useBombFinance from '../../../hooks/useBombFinance';
-import BondCard from './BondCard'
+import BondCard from './BondButton'
 import useBondsPurchasable from '../../../hooks/useBondsPurchasable';
 import useCashPriceInLastTWAP from '../../../hooks/useCashPriceInLastTWAP';
 import { useTransactionAdder } from '../../../state/transactions/hooks';
@@ -17,7 +17,6 @@ import useTokenBalance from '../../../hooks/useTokenBalance';
 const Bonds = () => {
 
   const bondStat = useBondStats();
-  console.log(bondStat);
   const bombFinance = useBombFinance();
   const bondsPurchasable = useBondsPurchasable();
   const addTransaction = useTransactionAdder();

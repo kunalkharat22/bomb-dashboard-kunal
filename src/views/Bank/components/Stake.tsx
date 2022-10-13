@@ -113,7 +113,7 @@ const Stake: React.FC<StakeProps> = ({ bank }) => {
             {/* <Label text={`${bank.depositTokenName} Staked`} /> */}
           </StyledCardHeader>
           <StyledCardActions>
-            {/* {approveStatus !== ApprovalState.APPROVED ? (
+            {approveStatus !== ApprovalState.APPROVED ? (
               <Button
                 disabled={
                   bank.closedForStaking ||
@@ -132,7 +132,7 @@ const Stake: React.FC<StakeProps> = ({ bank }) => {
               >
                 {`Approve ${bank.depositTokenName}`}
               </Button>
-            ) : ( */}
+            ) : (
               <>
                 <IconButton onClick={onPresentWithdraw}>
                   <RemoveIcon />
@@ -162,7 +162,7 @@ const Stake: React.FC<StakeProps> = ({ bank }) => {
                   <AddIcon />
                 </IconButton>
               </>
-            {/* )} */}
+            )}
           </StyledCardActions>
         </StyledCardContentInner>
       </CardContent>

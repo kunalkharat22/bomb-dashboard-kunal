@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react'
+import React, {useMemo, useEffect} from 'react'
 import moment from 'moment';
 
 import Page from '../../components/Page';
@@ -16,10 +16,13 @@ import { Box, Card, CardContent, Grid, Typography, Button } from '@material-ui/c
 import ProgressCountdown from '../Boardroom/components/ProgressCountdown'
 import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
 import useCashPriceInEstimatedTWAP from './../../hooks/useCashPriceInEstimatedTWAP';
+import useCashPriceInLastTWAP from './../../hooks/useCashPriceInLastTWAP';
 import useTotalValueLocked from './../../hooks/useTotalValueLocked';
 
 import CountUp from 'react-countup';
 import { getDisplayBalance } from '../../utils/formatBalance';
+import useBombFinance from '../../hooks/useBombFinance';
+import { ethers, BigNumber } from 'ethers';
 
 
 const BackgroundImage = createGlobalStyle`
@@ -48,6 +51,8 @@ const Dashboard = () => {
   const { to } = useTreasuryAllocationTimes();
   const TVL = useTotalValueLocked();
   const cashStat = useCashPriceInEstimatedTWAP();
+  const bombFinance = useBombFinance()
+  const price = useCashPriceInLastTWAP()  
 
   const scalingFactor = useMemo(() => (cashStat ? Number(cashStat.priceInDollars).toFixed(4) : null), [cashStat]);
 
@@ -80,11 +85,11 @@ const Dashboard = () => {
                           </Typography>
                           <Typography variant='h6' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Next Epoch in</Typography>
                           <hr style={{ opacity: 0.5, margin: '10px 30px 10px 30px'}}/>
-                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Live TWAP: <span>{scalingFactor}</span></Typography>
+                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Live TWAP: <span style={{color: 'rgba(0, 232, 162, 1)'}}>{scalingFactor}</span></Typography>
                             <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>
-                              TVL: <CountUp end={TVL} separator="," prefix="$" />  
+                              TVL: <CountUp style={{color: 'rgba(0, 232, 162, 1)'}} end={TVL} separator="," prefix="$" />  
                             </Typography>
-                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Last Epoch TWAP</Typography>
+                            <Typography variant='body1' style={{ textTransform: 'capitalize', color: '#ffffff' }}>Last Epoch TWAP: <span style={{color: 'rgba(0, 232, 162, 1)'}}>{getDisplayBalance(price,14)}</span></Typography>
                         </Grid>
                         <Grid item xs={4}>
                           <Chart />
