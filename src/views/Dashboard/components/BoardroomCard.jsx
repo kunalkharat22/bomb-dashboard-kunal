@@ -19,6 +19,7 @@ import useWithdrawFromBoardroom from '../../../hooks/useWithdrawFromBoardroom';
 import useStakeToBoardroom from '../../../hooks/useStakeToBoardroom';
 import DepositModal from '../../Bank/components/DepositModal';
 import useTokenBalance from '../../../hooks/useTokenBalance';
+import { BsFillArrowUpCircleFill, BsArrowDownCircleFill } from 'react-icons/bs';
   
 
 const BoardroomCard = () => {
@@ -167,24 +168,11 @@ const BoardroomCard = () => {
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <Box sx={{display:'flex',flexWrap:'wrap', justifyContent:'center', marginTop:'0.5rem'}}>
-            
-            {/* <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
-              <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
-                Deposit
-              </Typography>
-            </Button>
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem' }}>
-              <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
-                Withdraw
-              </Typography>
-            </Button> */}
+          <Box sx={{display:'flex',flexWrap:'wrap', justifyContent:'center', marginTop:'0.5rem'}}>            
 
             {approveStatus !== ApprovalState.APPROVED ? (
                 <Button
-                  disabled={approveStatus !== ApprovalState.NOT_APPROVED}
-                  //className={approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'}
-                  //style={{marginTop: '20px'}}
+                  disabled={approveStatus !== ApprovalState.NOT_APPROVED}                  
                   onClick={approve}
                   variant='outlined' 
               style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 170px', textAlign:'center', whiteSpace:'nowrap', marginTop: '1rem' }}
@@ -195,23 +183,16 @@ const BoardroomCard = () => {
                 </Button>
               ) : (
                 <>
-                <Button onClick={onPresentDeposit} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+                <Button onClick={onPresentDeposit} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem', whiteSpace:'nowrap' }}>
                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
-                    Deposit
+                    Deposit<BsFillArrowUpCircleFill style={{paddingLeft:'0.5rem'}}/>
                   </Typography>
                 </Button>
-                <Button disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem' }}>
+                <Button disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem', whiteSpace:'nowrap' }}>
                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
-                    Withdraw
+                    Withdraw<BsArrowDownCircleFill style={{paddingLeft:'0.5rem'}}/>
                   </Typography>
-                </Button>
-                  {/* <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
-                    <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                  </IconButton>
-                  <StyledActionSpacer />
-                  <IconButton onClick={onPresentDeposit}>
-                    <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                  </IconButton> */}
+                </Button>                  
                 </>
               )}
             

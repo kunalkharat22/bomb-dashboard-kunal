@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid, Typography, Box, Button } from '@material-ui/core'
+import {BsFillArrowUpCircleFill, BsArrowDownCircleFill } from 'react-icons/bs'
 import bshare from '../assets/bshare.svg'
 import bombbtcb from '../assets/bombbtcb.svg'
 import {getDisplayBalance} from '../../../utils/formatBalance';
@@ -169,35 +170,24 @@ const BombFarmCard = ({bank}) => {
               </Button>
             ) : (
               <>
-                <Button disabled={bank.closedForStaking} onClick={() => (bank.closedForStaking ? null : onPresentDeposit())} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
+                <Button disabled={bank.closedForStaking} onClick={() => (bank.closedForStaking ? null : onPresentDeposit())} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem', whiteSpace:'nowrap' }}>
                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
-                    Deposit
+                    Deposit <BsFillArrowUpCircleFill />
                   </Typography>
                 </Button>
-                <Button onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem', marginRight:'0.5rem' }}>
+                <Button onClick={onPresentWithdraw} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem', marginRight:'0.5rem', whiteSpace:'nowrap' }}>
                   <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
-                    Withdraw
+                    Withdraw <BsArrowDownCircleFill />
                   </Typography>
                 </Button> 
 
                 
               </>
             )}
-
-            {/* <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginRight:'0.5rem' }}>
-              <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center' }}>
-                Deposit
-              </Typography>
-            </Button>
-            <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginLeft:'0.5rem', marginRight:'0.5rem' }}>
-              <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize',}}>
-                Withdraw
-              </Typography>
-            </Button> */}
-            
+        
             <Button onClick={onRedeem} variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 110px', textAlign:'center', marginLeft:'0.5rem', whiteSpace:'nowrap'}}>
               <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize'}}>
-                Claim Rewards
+                Claim Rewards<TokenSymbol symbol={bank.earnToken.symbol} size={25} />
               </Typography>
             </Button>
           </Box>

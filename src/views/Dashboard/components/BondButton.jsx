@@ -62,11 +62,6 @@ const BondCard = ({
 
 
 
-      {/* <Button variant='outlined' style={{width: '107px', height:'30px', border: '2px solid #fff', borderRadius: '40px', padding: '20px 80px', marginleft:'10rem'  }}>
-          <Typography variant='h5' style={{color: '#fff', textTransform: 'capitalize', textAlign: 'center', }}>
-               Purchase
-          </Typography>
-      </Button> */}
     </>
   )
 }
